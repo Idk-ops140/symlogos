@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Symlogos</title>
+  <style>
+    body {
+      background-color: black;
+      color: green;
+      font-family: 'Noto Sans Mono', monospace;
+      margin: 0;
+      padding: 0;
+    }
+
+    .terminal {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      padding: 10px;
+      max-width: 800px;
+      margin: 0 auto;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+
+    .input-line {
+      display: flex;
+      align-items: center;
+    }
+
+    .input-text {
+      color: green;
+      border: none;
+      background: black;
+      width: 100%;
+      padding: 5px;
+      font-size: 16px;
+      font-family: 'Noto Sans Mono', monospace;
+      color: green;
+    }
+
+    .audio-block {
+      display: flex;
+      align-items: center;
+      margin-top: 20px;
+      border: 2px solid green;
+      padding: 10px;
+      width: 300px;
+    }
+
+    .audio-block button {
+      background-color: green;
+      border: none;
+      color: black;
+      font-family: 'Noto Sans Mono', monospace;
+      cursor: pointer;
+      padding: 10px;
+      margin-left: 10px;
+    }
+
+    .audio-block button:hover {
+      background-color: #00cc00;
+    }
+
+    .download-link {
+      color: green;
+      margin-top: 10px;
+      text-decoration: none;
+    }
+
+    .download-link:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="terminal">
+    <div class="input-line">
+      <input type="text" id="inputText" class="input-text" placeholder="Type here..." />
+      <button id="speakBtn" class="speak-btn">Speak</button>
+    </div>
+    <div id="audioBlock" class="audio-block" style="display:none;">
+      <audio id="audioPlayer" controls style="width: 200px; height: 30px;"></audio>
+      <button onclick="playAudio()">Play</button>
+    </div>
+    <a id="downloadLink" class="download-link" style="display:none;" href="#" download="audio.wav">Download Audio</a>
+  </div>
+
+  <script>
+    // Function to convert text to speech and show the audio block
+    function speakText(text) {
+      const speechSynthesis = window.speechSynthesis;
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.voice = speechSynthesis.getVoices().find(voice => voice.name === 'Google UK English Male') || null;
+      utterance.pitch = 1;
+      utterance.rate = 1;
+
+      // Create a temporary audio file
+      const audioPlayer = document.getElementById('audioPlayer');
+      const audioBlock = document.getElementById('audioBlock');
+      const downloadLink = document.getElementById('downloadLink');
+
+      speechSynthesis.speak(utterance);
+      
+      // Show the audio player and play button
+      audioBlock.style.display = 'flex';
+      
+      utterance.onend = function () {
+        const audioBlob = new Blob([utterance], { type: 'audio/wav' });
+        const audioUrl = URL.createObjectURL(audioBlob);
+        audioPlayer.src = audioUrl;
+        downloadLink.href = audioUrl;
+        downloadLink.style.display = 'inline-block';
+      };
+    }
+
+    // Event listener for "Speak" button
+    document.getElementById('speakBtn').addEventListener('click', function () {
+      const inputText = document.getElementById('inputText').value;
+      if (inputText) {
+        speakText(inputText);
+      }
+    });
+
+    // Function to play the audio manually
+    function playAudio() {
+      const audioPlayer = document.getElementById('audioPlayer');
+      audioPlayer.play();
+    }
+  </script>
+</body>
+</html>
